@@ -1,0 +1,23 @@
+services:
+    backend:
+        image: edc-project-initializer-backend:latest
+        container_name: edc-project-initializer-backend
+        restart: always
+        build:
+            context: backend
+            dockerfile: src/main/docker/Dockerfile.jvm-multistage
+        ports:
+          - 8080:8080
+
+    frontend:
+        image: edc-project-initializer-frontend:latest
+        container_name: edc-project-initializer-frontend
+        restart: always
+        build:
+            context: frontend
+            dockerfile: Dockerfile
+        ports:
+          - 80:80
+        depends_on:
+            - backend    
+        
