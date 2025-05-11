@@ -40,6 +40,10 @@ jobs:
               working-directory: ./backend
               run: ./gradlew build
 
+            - name: Lint backend code
+              working-directory: ./backend
+              run: ./gradlew check
+
             - name: Install frontend dependencies
               working-directory: ./frontend
               run: npm ci
