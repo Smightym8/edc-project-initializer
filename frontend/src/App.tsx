@@ -1,20 +1,23 @@
 import './App.css'
 import {
     Box,
+    CircularProgress,
     Divider,
     FormControl,
     FormHelperText,
     InputLabel,
     MenuItem,
     Paper,
-    Select,
+    Select, type SelectChangeEvent,
     TextField,
     Typography
 } from "@mui/material";
 import * as React from "react";
+import useEdcVersions from "./hooks/useEdcVersions.ts";
 
 function App() {
-    const [edcVersions] = React.useState<string[]>(['0.12.0', '0.11.0', '0.10.0', '0.9.0', '0.8.0', '0.7.0', '0.6.0', '0.5.0']);
+    const {edcVersions, error, isLoading} = useEdcVersions();
+    const [selectedVersion, setSelectedVersion] = React.useState<string>('');
 
     return (
         <Box sx={{
@@ -33,69 +36,96 @@ function App() {
                 EDC Project Initializer
             </Typography>
 
-            <Paper
-                elevation={6}
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    minWidth: 1200,
-                    minHeight: 500,
-                    padding: '1em'
-                }}>
-                <Box sx={{flex: 1, padding: '1em'}}>
-                    <Typography
-                        component="h2"
-                        variant="h4"
-                        sx={{textAlign: 'center', marginBottom: '1em'}}>
-                        Project Settings
-                    </Typography>
-
-                    <FormControl fullWidth required sx={{marginBottom: '2em'}}>
-                        <InputLabel id="edc-version-select">EDC Version</InputLabel>
-                        <Select
-                            labelId="edc-version-select"
-                            id="edc-version-select"
-                            label="EDC Version"
+            {(() => {
+                if (isLoading) {
+                    return <CircularProgress/>;
+                } else if (error) {
+                    return (
+                        <Typography
+                            component="h2"
+                            variant="h5"
+                            sx={{textAlign: 'center'}}
                         >
-                            {edcVersions.map((edcVersion) => (
-                                <MenuItem key={edcVersion} value={edcVersion}>
-                                    {edcVersion}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText>Required</FormHelperText>
-                    </FormControl>
+                            {`Error loading EDC versions: ${error}`}
+                        </Typography>
+                    );
+                } else {
+                    return (
+                        <Paper
+                            elevation={6}
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                minWidth: 1200,
+                                minHeight: 500,
+                                padding: '1em',
+                            }}
+                        >
+                            <Box sx={{flex: 1, padding: '1em'}}>
+                                <Typography
+                                    component="h2"
+                                    variant="h4"
+                                    sx={{textAlign: 'center', marginBottom: '1em'}}
+                                >
+                                    Project Settings
+                                </Typography>
 
-                    <FormControl fullWidth sx={{marginBottom: '2em'}}>
-                        <TextField required
-                                   id="project-name-text-field"
-                                   label="Project Name"
-                                   variant="outlined"
-                        />
-                        <FormHelperText>Required</FormHelperText>
-                    </FormControl>
+                                <FormControl fullWidth required sx={{marginBottom: '2em'}}>
+                                    <InputLabel id="edc-version-select">EDC Version</InputLabel>
+                                    <Select
+                                        labelId="edc-version-select"
+                                        id="edc-version-select"
+                                        label="EDC Version"
+                                        value={selectedVersion}
+                                        onChange={(e: SelectChangeEvent) => {
+                                            setSelectedVersion(e.target.value);
+                                        }}
+                                    >
+                                        {edcVersions.map((edcVersion) => (
+                                            <MenuItem key={edcVersion.name} value={edcVersion.name}>
+                                                {edcVersion.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <FormHelperText>Required</FormHelperText>
+                                </FormControl>
 
-                    <FormControl fullWidth>
-                        <TextField required
-                                   id="group-id-text-field"
-                                   label="Group Id"
-                                   variant="outlined"
-                        />
-                        <FormHelperText>Required</FormHelperText>
-                    </FormControl>
-                </Box>
+                                <FormControl fullWidth sx={{marginBottom: '2em'}}>
+                                    <TextField
+                                        required
+                                        id="project-name-text-field"
+                                        label="Project Name"
+                                        variant="outlined"
+                                    />
+                                    <FormHelperText>Required</FormHelperText>
+                                </FormControl>
 
-                <Divider orientation="vertical" variant="middle" flexItem/>
+                                <FormControl fullWidth>
+                                    <TextField
+                                        required
+                                        id="group-id-text-field"
+                                        label="Group Id"
+                                        variant="outlined"
+                                    />
+                                    <FormHelperText>Required</FormHelperText>
+                                </FormControl>
+                            </Box>
 
-                <Box sx={{flex: 1, padding: '1rem'}}>
-                    <Typography
-                        component="h2"
-                        variant="h4"
-                        sx={{textAlign: 'center', marginBottom: '1em'}}>
-                        Dependencies
-                    </Typography>
-                </Box>
-            </Paper>
+                            <Divider orientation="vertical" variant="middle" flexItem/>
+
+                            <Box sx={{flex: 1, padding: '1rem'}}>
+                                <Typography
+                                    component="h2"
+                                    variant="h4"
+                                    sx={{textAlign: 'center', marginBottom: '1em'}}
+                                >
+                                    Dependencies
+                                </Typography>
+                            </Box>
+                        </Paper>
+                    );
+                }
+            })()}
         </Box>
     )
 }
