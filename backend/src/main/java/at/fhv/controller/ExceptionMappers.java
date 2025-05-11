@@ -7,11 +7,11 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 public class ExceptionMappers {
-    private static final Logger logger = Logger.getLogger(ExceptionMappers.class);
+    private static final Logger LOGGER = Logger.getLogger(ExceptionMappers.class);
 
     @ServerExceptionMapper
     public RestResponse<String> mapException(WebApplicationException e) {
-        logger.error("Error", e);
+        LOGGER.error("Error", e);
         RestResponse.Status status = RestResponse.Status.fromStatusCode(e.getResponse().getStatus());
         String errorMessage = e.getMessage();
         return RestResponse.ResponseBuilder
@@ -21,7 +21,7 @@ public class ExceptionMappers {
 
     @ServerExceptionMapper
     public RestResponse<String> mapException(Exception e) {
-        logger.error("Error", e);
+        LOGGER.error("Error", e);
         return RestResponse.ResponseBuilder
                 .create(Response.Status.INTERNAL_SERVER_ERROR, "Internal Server Error")
                 .build();
