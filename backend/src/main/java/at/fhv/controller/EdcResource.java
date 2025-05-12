@@ -1,7 +1,7 @@
 package at.fhv.controller;
 
 import at.fhv.dto.EdcReleaseDto;
-import at.fhv.dto.MavenPackageDto;
+import at.fhv.dto.MavenPackagesResponseDto;
 import at.fhv.restclient.GithubApiClient;
 import at.fhv.service.interfaces.EdcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,9 +32,12 @@ public class EdcResource {
 
     @GET
     @Path("/packages")
-    public RestResponse<List<MavenPackageDto>> getEdcMavenPackagesForVersion(@QueryParam("version") String version) throws JsonProcessingException {
-        var packages = edcService.getEdcMavenPackagesForVersion(version);
+    public RestResponse<MavenPackagesResponseDto> getEdcMavenPackagesForVersion(
+            @QueryParam("version") String version,
+            @QueryParam("page") int page,
+            @QueryParam("pageSize") int pageSize) throws JsonProcessingException {
+        var responseDto = edcService.getEdcMavenPackagesForVersion(version, page, pageSize);
 
-        return RestResponse.ok(packages);
+        return RestResponse.ok(responseDto);
     }
 }

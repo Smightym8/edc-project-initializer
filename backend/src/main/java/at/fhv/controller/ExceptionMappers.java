@@ -11,7 +11,7 @@ public class ExceptionMappers {
 
     @ServerExceptionMapper
     public RestResponse<String> mapException(WebApplicationException e) {
-        LOGGER.error("Error", e);
+        LOGGER.error(e);
         RestResponse.Status status = RestResponse.Status.fromStatusCode(e.getResponse().getStatus());
         String errorMessage = e.getMessage();
         return RestResponse.ResponseBuilder
@@ -21,9 +21,17 @@ public class ExceptionMappers {
 
     @ServerExceptionMapper
     public RestResponse<String> mapException(Exception e) {
-        LOGGER.error("Error", e);
+        LOGGER.error(e);
         return RestResponse.ResponseBuilder
                 .create(Response.Status.INTERNAL_SERVER_ERROR, "Internal Server Error")
+                .build();
+    }
+
+    @ServerExceptionMapper
+    public RestResponse<String> mapException(IllegalArgumentException e) {
+        LOGGER.error(e);
+        return RestResponse.ResponseBuilder
+                .create(Response.Status.BAD_REQUEST, e.getMessage())
                 .build();
     }
 }
