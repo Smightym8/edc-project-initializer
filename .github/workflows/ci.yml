@@ -40,9 +40,14 @@ jobs:
               working-directory: ./backend
               run: ./gradlew build
 
-            - name: Lint backend code
-              working-directory: ./backend
-              run: ./gradlew check
+            - name: Build backend docker image
+              uses: docker/build-push-action@v6
+              with:
+                file: ./src/main/docker/Dockerfile.jvm-multistage
+                context: backend
+                push: false
+                outputs: type=cacheonly
+                tags: edc-project-initializer-backend:latest
 
             - name: Install frontend dependencies
               working-directory: ./frontend
@@ -55,3 +60,12 @@ jobs:
             - name: Lint frontend code
               working-directory: ./frontend
               run: npm run lint
+
+            - name: Build frontend docker image
+              uses: docker/build-push-action@v6
+              with:
+                file: ./Dockerfile
+                context: frontend
+                push: false
+                outputs: type=cacheonly
+                tags: edc-project-initializer-frontend:latest
