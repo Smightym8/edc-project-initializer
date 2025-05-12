@@ -1,10 +1,12 @@
 package at.fhv.service.implementations;
 
+import at.fhv.dto.EdcReleaseDto;
 import at.fhv.dto.MavenPackageDto;
 import at.fhv.dto.MavenPackagesResponseDto;
 import at.fhv.dto.PaginationInfoDto;
 import at.fhv.exception.InvalidPageException;
 import at.fhv.exception.InvalidPageSizeException;
+import at.fhv.restclient.GithubApiClient;
 import at.fhv.restclient.MavenCentralApiClient;
 import at.fhv.service.interfaces.EdcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,15 @@ import java.util.List;
 @ApplicationScoped
 public class EdcServiceImpl implements EdcService {
     @RestClient
+    GithubApiClient githubApiClient;
+
+    @RestClient
     MavenCentralApiClient mavenCentralApiClient;
+
+    @Override
+    public List<EdcReleaseDto> getAllEdcReleases() {
+        return githubApiClient.getAllEdcReleases();
+    }
 
     @Override
     public MavenPackagesResponseDto getEdcMavenPackagesForVersion(String version, int page, int pageSize) throws JsonProcessingException {
@@ -38,9 +47,9 @@ public class EdcServiceImpl implements EdcService {
 
         int start = (page - 1) * pageSize;
 
-        RestResponse<String> response = mavenCentralApiClient.getMavenPackagesForVersion(query, start, pageSize, "json");
-        var mavenPackages = parseMavenPackages(response.getEntity());
-        var totalPages = calculateTotalPages(response.getEntity());
+        String response = mavenCentralApiClient.getMavenPackagesForVersion(query, start, pageSize, "json");
+        var mavenPackages = parseMavenPackages(response);
+        var totalPages = calculateTotalPages(response);
         var paginationInfo = new PaginationInfoDto(totalPages, page);
 
         return new MavenPackagesResponseDto(paginationInfo, mavenPackages);

@@ -6,6 +6,7 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
+@SuppressWarnings("unused")
 public class ExceptionMappers {
     private static final Logger LOGGER = Logger.getLogger(ExceptionMappers.class);
 

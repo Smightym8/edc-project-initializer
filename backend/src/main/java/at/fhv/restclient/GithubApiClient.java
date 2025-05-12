@@ -7,7 +7,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
 
@@ -17,5 +16,5 @@ public interface GithubApiClient {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    RestResponse<List<EdcReleaseDto>> getAllEdcReleases();
+    List<EdcReleaseDto> getAllEdcReleases();
 }
