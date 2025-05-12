@@ -43,7 +43,7 @@ jobs:
             - name: Build backend docker image
               uses: docker/build-push-action@v6
               with:
-                file: ./src/main/docker/Dockerfile.jvm-multistage
+                file: ./backend/src/main/docker/Dockerfile.jvm-multistage
                 context: backend
                 push: false
                 outputs: type=cacheonly
@@ -64,7 +64,7 @@ jobs:
             - name: Build frontend docker image
               uses: docker/build-push-action@v6
               with:
-                file: ./Dockerfile
+                file: ./frontend/Dockerfile
                 context: frontend
                 push: false
                 outputs: type=cacheonly
