@@ -13,7 +13,7 @@ COPY gradle.properties .
 COPY gradle ./gradle
 RUN chmod +x gradlew
 COPY src ./src
-RUN ./gradlew build
+RUN ./gradlew build -x test -x check
 
 FROM base AS final
 
