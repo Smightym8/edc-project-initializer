@@ -47,13 +47,6 @@
 
     <!-- Checks for header format                                   -->
     <!-- See https://checkstyle.org/config_header.html#RegexpHeader -->
-    <!--    <module name="RegexpHeader">-->
-    <!--        <property name="fileExtensions" value="java"/>-->
-    <!--        <property name="header"-->
-    <!--                  value="^/\*$\n^ \*  Copyright \(c\) 20\d\d((,| -) 20\d{2})? [A-Za-z].+\S$\n^ \*$\n^ \*  This program and the accompanying materials are made available under the$\n^ \*  terms of the Apache License, Version 2\.0 which is available at$\n^ \*  https://www\.apache\.org/licenses/LICENSE-2\.0$\n^ \*$\n^ \*  SPDX-License-Identifier: Apache-2\.0$\n^ \*$\n^ \*  Contributors:$\n^ \*       \S.*\S$\n^ \*$\n^ \*/$\n^$\n^package"/>-->
-    <!--        <property name="multiLines" value="11"/>-->
-    <!--    </module>-->
-
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -278,10 +271,8 @@
         </module>
         <module name="NoWhitespaceBeforeCaseDefaultColon"/>
         <!--We would rather have all overridden methods grouped together-->
-        <!--<module name="OverloadMethodsDeclarationOrder"/>-->
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
-        <!--<module name="VariableDeclarationUsageDistance"/>-->
         <module name="CustomImportOrder">
             <property name="sortImportsInGroupAlphabetically" value="true"/>
             <property name="separateLineBetweenGroups" value="true"/>
@@ -334,10 +325,6 @@
                       value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
             <property name="period" value=""/><!-- We don't require a period symbol at the end of the first line. -->
         </module>
-        <!--    disabled javadoc paragraph checking as it would complain about <p> tags-->
-        <!--    <module name="JavadocParagraph">-->
-        <!--      <property name="allowNewlineParagraph" value="false"/>-->
-        <!--    </module>-->
         <module name="RequireEmptyLineBeforeBlockTagGroup"/>
         <module name="AtclauseOrder">
             <property name="tagOrder" value="@param, @return, @throws, @deprecated"/>

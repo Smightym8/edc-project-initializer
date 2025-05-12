@@ -26,6 +26,10 @@ public class EdcServiceImpl implements EdcService {
     @RestClient
     MavenCentralApiClient mavenCentralApiClient;
 
+    public static final int DEFAULT_PAGE_SIZE = 20;
+    public static final String JSON_FORMAT = "json";
+    public static final String QUERY_PREFIX = "g:org.eclipse.edc AND v:";
+
     @Override
     public List<EdcReleaseDto> getAllEdcReleases() {
         return githubApiClient.getAllEdcReleases();
@@ -33,12 +37,12 @@ public class EdcServiceImpl implements EdcService {
 
     @Override
     public MavenPackagesResponseDto getEdcMavenPackagesForVersion(String version, int page, int pageSize) throws JsonProcessingException {
-        String query = "g:org.eclipse.edc AND v:" + version;
+        String query = QUERY_PREFIX + version;
 
         if (pageSize < 0) {
             throw new InvalidPageSizeException(pageSize);
         } else if (pageSize == 0) {
-            pageSize = 20;
+            pageSize = DEFAULT_PAGE_SIZE;
         }
 
         if (page <= 0) {
@@ -47,7 +51,7 @@ public class EdcServiceImpl implements EdcService {
 
         int start = (page - 1) * pageSize;
 
-        String response = mavenCentralApiClient.getMavenPackagesForVersion(query, start, pageSize, "json");
+        String response = mavenCentralApiClient.getMavenPackagesForVersion(query, start, pageSize, JSON_FORMAT);
         var mavenPackages = parseMavenPackages(response);
         var totalPages = calculateTotalPages(response);
         var paginationInfo = new PaginationInfoDto(totalPages, page);

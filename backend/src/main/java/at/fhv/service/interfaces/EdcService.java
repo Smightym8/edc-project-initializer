@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface EdcService {
     List<EdcReleaseDto> getAllEdcReleases();
+
     MavenPackagesResponseDto getEdcMavenPackagesForVersion(String version, int page, int pageSize) throws JsonProcessingException;
 }
