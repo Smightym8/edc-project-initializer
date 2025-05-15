@@ -13,7 +13,7 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText, MenuItem, Pagination, Select, Typography,
-    type SelectChangeEvent
+    type SelectChangeEvent, Alert
 } from "@mui/material";
 import useEdcMavenPackages from "../hooks/useEdcMavenPackages.ts";
 import type {MavenPackageDTO} from "../api/models/maven-package-dto.ts";
@@ -70,7 +70,9 @@ const AddDependenciesDialog = ({open, handleClose, selectedVersion}: AddDependen
                     alignItems: 'center',
                 }}
             >
-                <Typography color="error">{error}</Typography>
+                <Alert severity="error" variant="outlined" sx={{ maxWidth: 500 }}>
+                    {error}
+                </Alert>
             </Box>
         );
     } else {

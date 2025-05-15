@@ -2,7 +2,6 @@ import {useState} from "react";
 import type {MavenPackageResponseDTO} from "../api/models/maven-packages-response-dto.ts";
 import {getEDCMavenPackages} from "../api/api.ts";
 
-
 const useEdcMavenPackages = () => {
     const [mavenPackagesResponse, setMavenPackagesResponse] = useState<MavenPackageResponseDTO | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -13,9 +12,9 @@ const useEdcMavenPackages = () => {
             .then((response) => {
                 setMavenPackagesResponse(response);
             })
-            .catch((error) => {
+            .catch((error: Error) => {
                 console.error(error);
-                setError(error);
+                setError(error.message);
             })
             .finally(() => {
                 setIsLoading(false)

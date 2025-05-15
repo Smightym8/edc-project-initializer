@@ -1,5 +1,6 @@
 import './App.css'
 import {
+    Alert,
     Box,
     Button,
     CircularProgress,
@@ -53,13 +54,18 @@ function App() {
                         return <CircularProgress/>;
                     } else if (error) {
                         return (
-                            <Typography
-                                component="h2"
-                                variant="h5"
-                                sx={{textAlign: 'center'}}
+                            <Box
+                                sx={{
+                                    flexGrow: 1,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
                             >
-                                {`Error loading EDC versions: ${error}`}
-                            </Typography>
+                                <Alert severity="error" variant="outlined" sx={{ maxWidth: 500 }}>
+                                    {error}
+                                </Alert>
+                            </Box>
                         );
                     } else {
                         return (
