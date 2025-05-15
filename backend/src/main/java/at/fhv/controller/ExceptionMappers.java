@@ -2,7 +2,6 @@ package at.fhv.controller;
 
 import at.fhv.dto.ProblemDetailsDto;
 import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
