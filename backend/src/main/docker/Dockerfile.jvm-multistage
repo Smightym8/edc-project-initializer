@@ -12,6 +12,9 @@ COPY build.gradle.kts .
 COPY gradle.properties .
 COPY gradle ./gradle
 RUN chmod +x gradlew
+RUN apt update -y && apt upgrade -y
+RUN apt install -y dos2unix
+RUN dos2unix gradlew
 COPY src ./src
 RUN ./gradlew build -x test -x check
 
