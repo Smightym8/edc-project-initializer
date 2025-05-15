@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import {getEDCVersions} from "../api/api.ts";
 import type {ReleaseDTO} from "../api/models/release-dto.ts";
 
-
 const useEdcVersions = () => {
     const [edcVersions, setEdcVersions] = useState<ReleaseDTO[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -17,9 +16,9 @@ const useEdcVersions = () => {
             .then((versions) => {
                 setEdcVersions(versions);
             })
-            .catch((error) => {
+            .catch((error: Error) => {
                 console.error(error);
-                setError(error);
+                setError(error.message);
             })
             .finally(() => {
                 setIsLoading(false)
