@@ -26,7 +26,7 @@ public class EdcServiceImpl implements EdcService {
     @RestClient
     MavenCentralApiClient mavenCentralApiClient;
 
-    public static final int DEFAULT_PAGE_SIZE = 20;
+    public static final int DEFAULT_PAGE_SIZE = 25;
     public static final String JSON_FORMAT = "json";
     public static final String QUERY_PREFIX = "g:org.eclipse.edc AND v:";
 

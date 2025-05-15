@@ -1,18 +1,15 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import type {MavenPackageResponseDTO} from "../api/models/maven-packages-response-dto.ts";
 import {getEDCMavenPackages} from "../api/api.ts";
 
-const useEDCMavenPackages = () => {
+
+const useEdcMavenPackages = () => {
     const [mavenPackagesResponse, setMavenPackagesResponse] = useState<MavenPackageResponseDTO | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        fetchMavenPackages();
-    }, []);
-
-    const fetchMavenPackages = () => {
-        getEDCMavenPackages('v0.12.0', 1, 20)
+    const fetchMavenPackages = (selectedVersion: string, page: number, pageSize: number) => {
+        getEDCMavenPackages(selectedVersion, page, pageSize)
             .then((response) => {
                 setMavenPackagesResponse(response);
             })
@@ -25,7 +22,7 @@ const useEDCMavenPackages = () => {
             });
     };
 
-    return {mavenPackagesResponse, error, isLoading};
+    return {mavenPackagesResponse, error, isLoading, fetchMavenPackages};
 };
 
-export default useEDCMavenPackages;
+export default useEdcMavenPackages;

@@ -147,7 +147,7 @@ function App() {
                     }
                 })()}
             </Box>
-            <AddDependenciesDialog open={open} handleClose={handleClose}/>
+            <AddDependenciesDialog open={open} handleClose={handleClose} selectedVersion={selectedVersion}/>
         </>
     )
 }
