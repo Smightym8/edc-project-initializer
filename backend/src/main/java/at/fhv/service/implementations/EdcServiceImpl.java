@@ -12,6 +12,8 @@ import at.fhv.service.interfaces.EdcService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.cache.CacheKey;
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -30,11 +32,13 @@ public class EdcServiceImpl implements EdcService {
     public static final String JSON_FORMAT = "json";
     public static final String QUERY_PREFIX = "g:org.eclipse.edc AND v:";
 
+    @CacheResult(cacheName = "edc-releases-cache")
     @Override
     public List<EdcReleaseDto> getAllEdcReleases() {
         return githubApiClient.getAllEdcReleases();
     }
 
+    @CacheResult(cacheName = "maven-packages-cache")
     @Override
     public MavenPackagesResponseDto getEdcMavenPackagesForVersion(String version, int page, int pageSize) throws JsonProcessingException {
         String query = QUERY_PREFIX + version;
