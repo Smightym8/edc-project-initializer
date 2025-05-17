@@ -78,7 +78,7 @@ function App() {
                                     alignItems: 'center',
                                 }}
                             >
-                                <Alert severity="error" variant="outlined" sx={{ maxWidth: 500 }}>
+                                <Alert severity="error" variant="outlined" sx={{maxWidth: 500}}>
                                     {error}
                                 </Alert>
                             </Box>
@@ -164,26 +164,39 @@ function App() {
                                             Add Dependencies
                                         </Button>
                                     </Box>
-                                    <Box sx={{flexGrow: 1, height: '80%', overflowY: 'auto', p: 2}}>
-                                        <List sx={{width: '100%', bgcolor: 'background.paper'}}>
-                                            {selectedMavenPackages.map((mavenPackage: MavenPackageDTO) => (
-                                                <React.Fragment key={mavenPackage.id}>
-                                                    <ListItem>
-                                                        <ListItemButton onClick={handleSelect(mavenPackage)}>
-                                                            <ListItemText
-                                                                id={mavenPackage.id}
-                                                                primary={mavenPackage.name}
-                                                            />
-                                                            <ListItemIcon>
-                                                                <RemoveCircle color="error" />
-                                                            </ListItemIcon>
-                                                        </ListItemButton>
-                                                    </ListItem>
-                                                    <Divider/>
-                                                </React.Fragment>
-                                            ))}
-                                        </List>
-                                    </Box>
+                                    {selectedMavenPackages.length > 0 ? (
+                                        <Box sx={{flexGrow: 1, height: '80%', overflowY: 'auto', p: 2}}>
+                                            <List sx={{width: '100%', bgcolor: 'background.paper'}}>
+                                                {selectedMavenPackages.map((mavenPackage: MavenPackageDTO) => (
+                                                    <React.Fragment key={mavenPackage.id}>
+                                                        <ListItem>
+                                                            <ListItemButton onClick={handleSelect(mavenPackage)}>
+                                                                <ListItemText
+                                                                    id={mavenPackage.id}
+                                                                    primary={mavenPackage.name}
+                                                                />
+                                                                <ListItemIcon>
+                                                                    <RemoveCircle color="error"/>
+                                                                </ListItemIcon>
+                                                            </ListItemButton>
+                                                        </ListItem>
+                                                        <Divider/>
+                                                    </React.Fragment>
+                                                ))}
+                                            </List>
+                                        </Box>
+                                    ) : (
+                                        <Typography sx={{
+                                            flexGrow: 1,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            height: '80%',
+                                            color: 'text.secondary'
+                                        }}>
+                                            No dependencies selected
+                                        </Typography>
+                                    )}
                                 </Box>
                             </Paper>
                         );

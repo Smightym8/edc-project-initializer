@@ -81,6 +81,21 @@ const AddDependenciesDialog = ({
                 </Alert>
             </Box>
         );
+    } else if (mavenPackagesResponse?.mavenPackages.length === 0) {
+        content = (
+            <Box
+                sx={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Alert severity="info" variant="outlined" sx={{maxWidth: 500}}>
+                    No Maven packages found for the selected version {selectedVersion}.
+                </Alert>
+            </Box>
+        );
     } else {
         content = (
             <>
