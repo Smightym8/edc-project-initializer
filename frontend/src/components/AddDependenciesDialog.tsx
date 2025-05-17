@@ -1,7 +1,6 @@
 import {
     Box,
     Button,
-    Checkbox,
     CircularProgress,
     Dialog,
     DialogActions,
@@ -11,7 +10,6 @@ import {
     List,
     ListItem,
     ListItemButton,
-    ListItemIcon,
     ListItemText, MenuItem, Pagination, Select, Typography,
     type SelectChangeEvent, Alert
 } from "@mui/material";
@@ -24,11 +22,19 @@ interface AddDependenciesDialogProps {
     open: boolean;
     handleClose: () => void;
     selectedVersion: string;
+    selectedMavenPackages: MavenPackageDTO[];
+    handleSelect: (value: MavenPackageDTO) => () => void;
 }
 
-const AddDependenciesDialog = ({open, handleClose, selectedVersion}: AddDependenciesDialogProps) => {
+const AddDependenciesDialog = ({
+                                   open,
+                                   handleClose,
+                                   selectedVersion,
+                                   selectedMavenPackages,
+                                   handleSelect
+                               }: AddDependenciesDialogProps) => {
     const {mavenPackagesResponse, error, isLoading, fetchMavenPackages} = useEdcMavenPackages();
-    const [pagination, setPagination] = useState({ page: 1, pageSize: 25 });
+    const [pagination, setPagination] = useState({page: 1, pageSize: 25});
 
     useEffect(() => {
         if (open) {
@@ -37,12 +43,12 @@ const AddDependenciesDialog = ({open, handleClose, selectedVersion}: AddDependen
     }, [open, pagination]);
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-        setPagination(prev => ({ ...prev, page: value }));
+        setPagination(prev => ({...prev, page: value}));
     };
 
     const handlePageSizeChange = (event: SelectChangeEvent<number>) => {
         const newPageSize = event.target.value;
-        setPagination({ page: 1, pageSize: newPageSize });
+        setPagination({page: 1, pageSize: newPageSize});
     };
 
     let content;
@@ -57,7 +63,7 @@ const AddDependenciesDialog = ({open, handleClose, selectedVersion}: AddDependen
                     alignItems: 'center',
                 }}
             >
-                <CircularProgress />
+                <CircularProgress/>
             </Box>
         );
     } else if (error) {
@@ -70,8 +76,23 @@ const AddDependenciesDialog = ({open, handleClose, selectedVersion}: AddDependen
                     alignItems: 'center',
                 }}
             >
-                <Alert severity="error" variant="outlined" sx={{ maxWidth: 500 }}>
+                <Alert severity="error" variant="outlined" sx={{maxWidth: 500}}>
                     {error}
+                </Alert>
+            </Box>
+        );
+    } else if (mavenPackagesResponse?.mavenPackages.length === 0) {
+        content = (
+            <Box
+                sx={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Alert severity="info" variant="outlined" sx={{maxWidth: 500}}>
+                    No Maven packages found for the selected version {selectedVersion}.
                 </Alert>
             </Box>
         );
@@ -83,14 +104,10 @@ const AddDependenciesDialog = ({open, handleClose, selectedVersion}: AddDependen
                         {mavenPackagesResponse?.mavenPackages.map((mavenPackage: MavenPackageDTO) => (
                             <React.Fragment key={mavenPackage.id}>
                                 <ListItem>
-                                    <ListItemButton>
-                                        <ListItemIcon>
-                                            <Checkbox
-                                                edge="start"
-                                                checked={false}
-                                                tabIndex={-1}
-                                                disableRipple/>
-                                        </ListItemIcon>
+                                    <ListItemButton
+                                        selected={selectedMavenPackages.some(item => item.id === mavenPackage.id)}
+                                        onClick={handleSelect(mavenPackage)}
+                                    >
                                         <ListItemText id={mavenPackage.id} primary={mavenPackage.name}/>
                                     </ListItemButton>
                                 </ListItem>

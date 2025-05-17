@@ -7,7 +7,7 @@ import {
     Divider,
     FormControl,
     FormHelperText,
-    InputLabel,
+    InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
     MenuItem,
     Paper,
     Select, type SelectChangeEvent,
@@ -17,11 +17,14 @@ import {
 import * as React from "react";
 import useEdcVersions from "./hooks/useEdcVersions.ts";
 import AddDependenciesDialog from "./components/AddDependenciesDialog.tsx";
+import type {MavenPackageDTO} from "./api/models/maven-package-dto.ts";
+import RemoveCircle from '@mui/icons-material/RemoveCircle';
 
 function App() {
     const {edcVersions, error, isLoading} = useEdcVersions();
     const [selectedVersion, setSelectedVersion] = React.useState<string>('');
     const [open, setOpen] = React.useState(false);
+    const [selectedMavenPackages, setSelectedMavenPackages] = React.useState<MavenPackageDTO[]>([]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -29,6 +32,19 @@ function App() {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleSelect = (value: MavenPackageDTO) => () => {
+        const currentIndex = selectedMavenPackages.findIndex(item => item.id === value.id);
+        const newChecked = [...selectedMavenPackages];
+
+        if (currentIndex === -1) {
+            newChecked.push(value);
+        } else {
+            newChecked.splice(currentIndex, 1);
+        }
+
+        setSelectedMavenPackages(newChecked);
     };
 
     return (
@@ -62,7 +78,7 @@ function App() {
                                     alignItems: 'center',
                                 }}
                             >
-                                <Alert severity="error" variant="outlined" sx={{ maxWidth: 500 }}>
+                                <Alert severity="error" variant="outlined" sx={{maxWidth: 500}}>
                                     {error}
                                 </Alert>
                             </Box>
@@ -76,7 +92,8 @@ function App() {
                                     flexDirection: 'row',
                                     minWidth: 1200,
                                     minHeight: 500,
-                                    padding: '1em',
+                                    maxHeight: 500,
+                                    padding: '1em'
                                 }}
                             >
                                 <Box sx={{flex: 1, padding: '1em'}}>
@@ -129,7 +146,7 @@ function App() {
 
                                 <Divider orientation="vertical" variant="middle" flexItem/>
 
-                                <Box sx={{flex: 1, padding: '1rem'}}>
+                                <Box sx={{flex: 1, padding: '1em'}}>
                                     <Box sx={{display: 'flex', marginBottom: '1em'}}>
                                         <Typography
                                             component="h2"
@@ -147,13 +164,52 @@ function App() {
                                             Add Dependencies
                                         </Button>
                                     </Box>
+                                    {selectedMavenPackages.length > 0 ? (
+                                        <Box sx={{flexGrow: 1, height: '80%', overflowY: 'auto', p: 2}}>
+                                            <List sx={{width: '100%', bgcolor: 'background.paper'}}>
+                                                {selectedMavenPackages.map((mavenPackage: MavenPackageDTO) => (
+                                                    <React.Fragment key={mavenPackage.id}>
+                                                        <ListItem>
+                                                            <ListItemButton onClick={handleSelect(mavenPackage)}>
+                                                                <ListItemText
+                                                                    id={mavenPackage.id}
+                                                                    primary={mavenPackage.name}
+                                                                />
+                                                                <ListItemIcon>
+                                                                    <RemoveCircle color="error"/>
+                                                                </ListItemIcon>
+                                                            </ListItemButton>
+                                                        </ListItem>
+                                                        <Divider/>
+                                                    </React.Fragment>
+                                                ))}
+                                            </List>
+                                        </Box>
+                                    ) : (
+                                        <Typography sx={{
+                                            flexGrow: 1,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            height: '80%',
+                                            color: 'text.secondary'
+                                        }}>
+                                            No dependencies selected
+                                        </Typography>
+                                    )}
                                 </Box>
                             </Paper>
                         );
                     }
                 })()}
             </Box>
-            <AddDependenciesDialog open={open} handleClose={handleClose} selectedVersion={selectedVersion}/>
+            <AddDependenciesDialog
+                open={open}
+                handleClose={handleClose}
+                selectedVersion={selectedVersion}
+                selectedMavenPackages={selectedMavenPackages}
+                handleSelect={handleSelect}
+            />
         </>
     )
 }
