@@ -6,6 +6,8 @@ services:
         build:
             context: backend
             dockerfile: src/main/docker/Dockerfile.jvm-multistage
+        volumes:
+            - ./edc-project-template:/edc-project-template:ro
         ports:
           - 8080:8080
 
