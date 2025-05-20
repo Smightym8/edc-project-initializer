@@ -1,10 +1,12 @@
 import {generateProject} from "../api/api.ts";
 import type {ProjectCreateDTO} from "../api/models/project-create-dto.ts";
 import {useState} from "react";
+import {useSnackbar} from "./useSnackbar.ts";
 
 const useGenerateProject = () => {
     const [error, setError] = useState<string | null>(null);
     const [isGeneratingProject, setIsGeneratingProject] = useState<boolean>(false);
+    const { showSnackbar } = useSnackbar();
 
     const createProject = (projectCreateDto: ProjectCreateDTO) => {
         setIsGeneratingProject(true);
@@ -19,10 +21,13 @@ const useGenerateProject = () => {
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
+
+                showSnackbar('success', 'Project generated successfully!');
             })
             .catch((error: Error) => {
                 setError(error.message);
                 console.error(error);
+                showSnackbar('error', `Failed to generate project. Error: ${error.message}`);
             })
             .finally(() => {
                 setIsGeneratingProject(false)
