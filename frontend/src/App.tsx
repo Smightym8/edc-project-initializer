@@ -20,17 +20,20 @@ import AddDependenciesDialog from "./components/AddDependenciesDialog.tsx";
 import type {MavenPackageDTO} from "./api/models/maven-package-dto.ts";
 import RemoveCircle from '@mui/icons-material/RemoveCircle';
 import type {ProjectCreateDTO} from "./api/models/project-create-dto.ts";
-import {generateProject} from "./api/api.ts";
+import useGenerateProject from "./hooks/useGenerateProject.ts";
 
 function App() {
-    const {edcVersions, error, isLoading} = useEdcVersions();
+    const {edcVersions, getEdcVersionsError, isLoading} = useEdcVersions();
     const [selectedVersion, setSelectedVersion] = React.useState<string>('');
+    const [selectedVersionError, setSelectedVersionError] = React.useState<boolean>(false);
     const [open, setOpen] = React.useState(false);
     const [selectedMavenPackages, setSelectedMavenPackages] = React.useState<MavenPackageDTO[]>([]);
+    const [selectedMavenPackagesError, setSelectedMavenPackagesError] = React.useState<boolean>(false);
     const [projectName, setProjectName] = React.useState<string>('');
     const [projectNameError, setProjectNameError] = React.useState<boolean>(false);
     const [groupId, setGroupId] = React.useState<string>('');
     const [groupIdError, setGroupIdError] = React.useState<boolean>(false);
+    const {isGeneratingProject, createProject} = useGenerateProject();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -64,24 +67,25 @@ function App() {
             dependencies: selectedMavenPackages
         }
 
-        generateProject(projectCreateDto)
-            .then((blob: Blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${projectName}.zip`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch((error: Error) => {
-                console.error(error);
-            });
+        createProject(projectCreateDto);
     }
 
     const isFormValid = (): boolean => {
         let isValid = false;
+
+        if (selectedVersion === '') {
+            setSelectedVersionError(true);
+        } else {
+            setSelectedVersionError(false);
+            isValid = true;
+        }
+
+        if (selectedMavenPackages.length === 0) {
+            setSelectedMavenPackagesError(true);
+        } else {
+            setSelectedMavenPackagesError(false);
+            isValid = true;
+        }
 
         if (projectName === '') {
             setProjectNameError(true);
@@ -108,7 +112,7 @@ function App() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '2em',
-                paddingTop: '2.5em',
+                padding: '2.5em 0',
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
@@ -121,7 +125,7 @@ function App() {
                 {(() => {
                     if (isLoading) {
                         return <CircularProgress/>;
-                    } else if (error) {
+                    } else if (getEdcVersionsError) {
                         return (
                             <Box
                                 sx={{
@@ -132,7 +136,7 @@ function App() {
                                 }}
                             >
                                 <Alert severity="error" variant="outlined" sx={{maxWidth: 500}}>
-                                    {error}
+                                    {getEdcVersionsError}
                                 </Alert>
                             </Box>
                         );
@@ -144,8 +148,8 @@ function App() {
                                     display: 'flex',
                                     flexDirection: 'column',
                                     minWidth: 1200,
-                                    minHeight: 500,
-                                    maxHeight: 500,
+                                    minHeight: 600,
+                                    maxHeight: 600,
                                     padding: '1em'
                                 }}
                             >
@@ -153,7 +157,7 @@ function App() {
                                     sx={{
                                         display: 'flex',
                                         flexDirection: 'row',
-                                        height: '90%',
+                                        flex: 1,
                                         overflowY: 'hidden',
                                     }}
                                 >
@@ -166,7 +170,7 @@ function App() {
                                             Project Settings
                                         </Typography>
 
-                                        <FormControl fullWidth sx={{marginBottom: '2em'}}>
+                                        <FormControl fullWidth sx={{marginBottom: '2em'}} error={selectedVersionError}>
                                             <InputLabel id="edc-version-select">EDC Version</InputLabel>
                                             <Select
                                                 labelId="edc-version-select"
@@ -183,6 +187,8 @@ function App() {
                                                     </MenuItem>
                                                 ))}
                                             </Select>
+                                            {selectedVersionError &&
+                                                <FormHelperText>You have to select a version.</FormHelperText>}
                                         </FormControl>
 
                                         <FormControl fullWidth sx={{marginBottom: '2em'}} error={projectNameError}>
@@ -196,7 +202,7 @@ function App() {
                                                 variant="outlined"/>
 
                                             {projectNameError &&
-                                                <FormHelperText>Project name is required</FormHelperText>}
+                                                <FormHelperText>Project name is required.</FormHelperText>}
                                         </FormControl>
 
                                         <FormControl fullWidth error={groupIdError}>
@@ -209,7 +215,7 @@ function App() {
                                                 label="Group Id"
                                                 variant="outlined"/>
 
-                                            {groupIdError && <FormHelperText>Group Id is required</FormHelperText>}
+                                            {groupIdError && <FormHelperText>Group Id is required.</FormHelperText>}
                                         </FormControl>
                                     </Box>
 
@@ -255,16 +261,27 @@ function App() {
                                                 </List>
                                             </Box>
                                         ) : (
-                                            <Typography sx={{
+                                            <Box sx={{
                                                 flexGrow: 1,
                                                 display: 'flex',
+                                                flexDirection: 'column',
                                                 justifyContent: 'center',
                                                 alignItems: 'center',
                                                 height: '80%',
                                                 color: 'text.secondary'
                                             }}>
-                                                No dependencies selected
-                                            </Typography>
+                                                <Typography sx={{
+                                                    color: 'text.secondary'
+                                                }}>
+                                                    No dependencies selected
+                                                </Typography>
+
+                                                {selectedMavenPackagesError &&
+                                                    <Alert severity="error" variant="outlined" sx={{ marginTop: '1em' }}>
+                                                        You have to select at least one dependency.
+                                                    </Alert>
+                                                }
+                                            </Box>
                                         )}
                                     </Box>
                                 </Box>
@@ -273,11 +290,13 @@ function App() {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        marginTop: '6em',
-                                        height: '20%',
+                                        marginTop: '6em'
                                     }}
                                 >
-                                    <Button variant='contained' onClick={handleGenerateProject}>
+                                    <Button
+                                        variant='contained'
+                                        loading={isGeneratingProject}
+                                        onClick={handleGenerateProject}>
                                         Generate Project
                                     </Button>
                                 </Box>

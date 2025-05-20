@@ -25,7 +25,7 @@ const useEdcVersions = () => {
             });
     };
 
-    return {edcVersions, error, isLoading};
+    return {edcVersions, getEdcVersionsError: error, isLoading};
 };
 
 export default useEdcVersions;
