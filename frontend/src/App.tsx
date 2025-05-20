@@ -71,38 +71,42 @@ function App() {
     }
 
     const isFormValid = (): boolean => {
-        let isValid = false;
+        let isValid = true;
 
-        if (selectedVersion === '') {
+        if (selectedVersion === '' || isStringOnlyWhitespace(selectedVersion)) {
             setSelectedVersionError(true);
+            isValid = false;
         } else {
             setSelectedVersionError(false);
-            isValid = true;
         }
 
         if (selectedMavenPackages.length === 0) {
             setSelectedMavenPackagesError(true);
+            isValid = false;
         } else {
             setSelectedMavenPackagesError(false);
-            isValid = true;
         }
 
-        if (projectName === '') {
+        if (projectName === ''  || isStringOnlyWhitespace(projectName)) {
             setProjectNameError(true);
+            isValid = false;
         } else {
             setProjectNameError(false);
-            isValid = true;
         }
 
-        if (groupId === '') {
+        if (groupId === ''  || isStringOnlyWhitespace(groupId)) {
             setGroupIdError(true);
+            isValid = false;
         } else {
             setGroupIdError(false);
-            isValid = true;
         }
 
         return isValid;
     }
+
+    const isStringOnlyWhitespace = (str: string): boolean => {
+        return str.trim().length === 0;
+    };
 
     return (
         <>
