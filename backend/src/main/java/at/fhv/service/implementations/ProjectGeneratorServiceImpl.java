@@ -1,6 +1,8 @@
 package at.fhv.service.implementations;
 
+import at.fhv.dto.InvalidParamDto;
 import at.fhv.dto.ProjectCreateDto;
+import at.fhv.exception.ValidationException;
 import at.fhv.service.interfaces.ProjectGeneratorService;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
@@ -13,6 +15,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -43,6 +47,8 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
 
     @Override
     public byte[] generateProject(ProjectCreateDto projectCreateDto) throws IOException {
+        validateProjectCreateDto(projectCreateDto);
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         try (ZipOutputStream zipOut = new ZipOutputStream(byteArrayOutputStream)) {
@@ -60,6 +66,26 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
         }
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    private static void validateProjectCreateDto(ProjectCreateDto projectCreateDto) {
+        List<InvalidParamDto> invalidParameters = new ArrayList<>();
+
+        if (projectCreateDto.projectName().isBlank()) {
+            invalidParameters.add(new InvalidParamDto("projectName", "Project name is required"));
+        }
+
+        if (projectCreateDto.groupId().isBlank()) {
+            invalidParameters.add(new InvalidParamDto("groupId", "Group id is required"));
+        }
+
+        if (projectCreateDto.dependencies() == null || projectCreateDto.dependencies().isEmpty()) {
+            invalidParameters.add(new InvalidParamDto("dependencies", "Dependencies are required"));
+        }
+
+        if (!invalidParameters.isEmpty()) {
+            throw new ValidationException(invalidParameters);
+        }
     }
 
     private void zipDirectoryFromFileSystem(File fileToZip, String fileName, ZipOutputStream zipOut) {

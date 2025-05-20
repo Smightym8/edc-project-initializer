@@ -1,11 +1,11 @@
 package at.fhv.service.implementations;
 
 import at.fhv.dto.EdcReleaseDto;
+import at.fhv.dto.InvalidParamDto;
 import at.fhv.dto.MavenPackageDto;
 import at.fhv.dto.MavenPackagesResponseDto;
 import at.fhv.dto.PaginationInfoDto;
-import at.fhv.exception.InvalidPageException;
-import at.fhv.exception.InvalidPageSizeException;
+import at.fhv.exception.ValidationException;
 import at.fhv.restclient.GithubApiClient;
 import at.fhv.restclient.MavenCentralApiClient;
 import at.fhv.service.interfaces.EdcService;
@@ -27,7 +27,6 @@ public class EdcServiceImpl implements EdcService {
     @RestClient
     MavenCentralApiClient mavenCentralApiClient;
 
-    public static final int DEFAULT_PAGE_SIZE = 25;
     public static final String JSON_FORMAT = "json";
     public static final String QUERY_PREFIX = "g:org.eclipse.edc AND v:";
 
@@ -40,18 +39,9 @@ public class EdcServiceImpl implements EdcService {
     @CacheResult(cacheName = "maven-packages-cache")
     @Override
     public MavenPackagesResponseDto getEdcMavenPackagesForVersion(String version, int page, int pageSize) throws JsonProcessingException {
+        validate(version, page, pageSize);
+
         String query = QUERY_PREFIX + version;
-
-        if (pageSize < 0) {
-            throw new InvalidPageSizeException(pageSize);
-        } else if (pageSize == 0) {
-            pageSize = DEFAULT_PAGE_SIZE;
-        }
-
-        if (page <= 0) {
-            throw new InvalidPageException(page);
-        }
-
         int start = (page - 1) * pageSize;
 
         String response = mavenCentralApiClient.getMavenPackagesForVersion(query, start, pageSize, JSON_FORMAT);
@@ -60,6 +50,26 @@ public class EdcServiceImpl implements EdcService {
         var paginationInfo = new PaginationInfoDto(totalPages, page);
 
         return new MavenPackagesResponseDto(paginationInfo, mavenPackages);
+    }
+
+    private static void validate(String version, int page, int pageSize) {
+        List<InvalidParamDto> invalidParameters = new ArrayList<>();
+
+        if (version == null || version.isBlank()) {
+            invalidParameters.add(new InvalidParamDto("version", "version is required."));
+        }
+
+        if (pageSize <= 0) {
+            invalidParameters.add(new InvalidParamDto("pageSize", "pageSize needs to be greater than 0."));
+        }
+
+        if (page <= 0) {
+            invalidParameters.add(new InvalidParamDto("page", "page needs to be greater than 0."));
+        }
+
+        if (!invalidParameters.isEmpty()) {
+            throw new ValidationException(invalidParameters);
+        }
     }
 
     private List<MavenPackageDto> parseMavenPackages(String json) throws JsonProcessingException {
