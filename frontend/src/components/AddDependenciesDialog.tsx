@@ -33,14 +33,14 @@ const AddDependenciesDialog = ({
                                    selectedMavenPackages,
                                    handleSelect
                                }: AddDependenciesDialogProps) => {
-    const {mavenPackagesResponse, error, isLoading, fetchMavenPackages} = useEdcMavenPackages();
     const [pagination, setPagination] = useState({page: 1, pageSize: 25});
+    const {mavenPackagesResponse, error, isLoading, fetchMavenPackages} = useEdcMavenPackages(selectedVersion, pagination.page, pagination.pageSize);
 
     useEffect(() => {
         if (open) {
-            fetchMavenPackages(selectedVersion, pagination.page, pagination.pageSize);
+            fetchMavenPackages();
         }
-    }, [open, pagination]);
+    }, [open, pagination, fetchMavenPackages, selectedVersion]);
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPagination(prev => ({...prev, page: value}));
@@ -52,7 +52,6 @@ const AddDependenciesDialog = ({
     };
 
     let content;
-
     if (isLoading) {
         content = (
             <Box
