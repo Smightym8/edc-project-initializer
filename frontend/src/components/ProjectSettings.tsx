@@ -8,6 +8,7 @@ import {
     type SelectChangeEvent, TextField,
     Typography
 } from "@mui/material";
+import * as React from "react";
 
 
 interface ProjectSettingsProps {
@@ -23,18 +24,18 @@ interface ProjectSettingsProps {
     groupIdError: boolean;
 }
 
-const ProjectSettings = ({
-                             edcVersions,
-                             selectedVersion,
-                             selectedVersionError,
-                             setSelectedVersion,
-                             projectName,
-                             setProjectName,
-                             projectNameError,
-                             groupId,
-                             setGroupId,
-                             groupIdError
-                         }: ProjectSettingsProps) => {
+const ProjectSettings: React.FC<ProjectSettingsProps> = ({
+                                                             edcVersions,
+                                                             selectedVersion,
+                                                             selectedVersionError,
+                                                             setSelectedVersion,
+                                                             projectName,
+                                                             setProjectName,
+                                                             projectNameError,
+                                                             groupId,
+                                                             setGroupId,
+                                                             groupIdError
+                                                         }) => {
     return (
         <Box sx={{flex: 1, padding: '1em'}}>
             <Typography

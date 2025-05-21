@@ -22,12 +22,12 @@ interface DependenciesProps {
     handleSelect: (value: MavenPackageDTO) => () => void;
 }
 
-const Dependencies = ({
-                          selectedVersion,
-                          selectedMavenPackages,
-                          selectedMavenPackagesError,
-                          handleSelect
-                      }: DependenciesProps) => {
+const Dependencies: React.FC<DependenciesProps> = ({
+                                                       selectedVersion,
+                                                       selectedMavenPackages,
+                                                       selectedMavenPackagesError,
+                                                       handleSelect
+                                                   }) => {
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
