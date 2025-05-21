@@ -38,6 +38,56 @@ const Dependencies = ({
         setOpen(false);
     };
 
+    let content;
+    if (selectedMavenPackages.length > 0) {
+        content = (
+            <Box sx={{flexGrow: 1, height: '80%', overflowY: 'auto', p: 2}}>
+                <List sx={{width: '100%', bgcolor: 'background.paper'}}>
+                    {selectedMavenPackages.map((mavenPackage: MavenPackageDTO) => (
+                        <React.Fragment key={mavenPackage.id}>
+                            <ListItem>
+                                <ListItemButton
+                                    onClick={handleSelect(mavenPackage)}>
+                                    <ListItemText
+                                        id={mavenPackage.id}
+                                        primary={mavenPackage.name}/>
+                                    <ListItemIcon>
+                                        <RemoveCircle color="error"/>
+                                    </ListItemIcon>
+                                </ListItemButton>
+                            </ListItem>
+                            <Divider/>
+                        </React.Fragment>
+                    ))}
+                </List>
+            </Box>
+        );
+    } else {
+        content = (
+            <Box sx={{
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '80%',
+                color: 'text.secondary'
+            }}>
+                <Typography sx={{
+                    color: 'text.secondary'
+                }}>
+                    No dependencies selected
+                </Typography>
+
+                {selectedMavenPackagesError &&
+                    <Alert severity="error" variant="outlined"
+                           sx={{marginTop: '1em'}}>
+                        You have to select at least one dependency.
+                    </Alert>}
+            </Box>
+        );
+    }
+
     return (
         <>
             <Box sx={{flex: 1, padding: '1em'}}>
@@ -58,50 +108,7 @@ const Dependencies = ({
                         Add Dependencies
                     </Button>
                 </Box>
-                {selectedMavenPackages.length > 0 ? (
-                    <Box sx={{flexGrow: 1, height: '80%', overflowY: 'auto', p: 2}}>
-                        <List sx={{width: '100%', bgcolor: 'background.paper'}}>
-                            {selectedMavenPackages.map((mavenPackage: MavenPackageDTO) => (
-                                <React.Fragment key={mavenPackage.id}>
-                                    <ListItem>
-                                        <ListItemButton
-                                            onClick={handleSelect(mavenPackage)}>
-                                            <ListItemText
-                                                id={mavenPackage.id}
-                                                primary={mavenPackage.name}/>
-                                            <ListItemIcon>
-                                                <RemoveCircle color="error"/>
-                                            </ListItemIcon>
-                                        </ListItemButton>
-                                    </ListItem>
-                                    <Divider/>
-                                </React.Fragment>
-                            ))}
-                        </List>
-                    </Box>
-                ) : (
-                    <Box sx={{
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '80%',
-                        color: 'text.secondary'
-                    }}>
-                        <Typography sx={{
-                            color: 'text.secondary'
-                        }}>
-                            No dependencies selected
-                        </Typography>
-
-                        {selectedMavenPackagesError &&
-                            <Alert severity="error" variant="outlined"
-                                   sx={{marginTop: '1em'}}>
-                                You have to select at least one dependency.
-                            </Alert>}
-                    </Box>
-                )}
+                {content}
             </Box>
             <AddDependenciesDialog
                 open={open}

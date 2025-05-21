@@ -96,6 +96,79 @@ function App() {
         return str.trim().length === 0;
     };
 
+    let content;
+
+    if (isLoading) {
+        content = <CircularProgress/>;
+    } else if (getEdcVersionsError) {
+        content = (
+            <Box
+                sx={{
+                    flexGrow: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Alert severity="error" variant="outlined" sx={{maxWidth: 500}}>
+                    {getEdcVersionsError}
+                </Alert>
+            </Box>
+        );
+    } else {
+        content = (
+            <Paper
+                elevation={6}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: 1200,
+                    minHeight: 600,
+                    maxHeight: 600,
+                    padding: '1em'
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        flex: 1,
+                        overflowY: 'hidden',
+                    }}
+                >
+                    <ProjectSettings edcVersions={edcVersions} selectedVersion={selectedVersion}
+                                     setSelectedVersion={setSelectedVersion}
+                                     selectedVersionError={selectedVersionError}
+                                     projectName={projectName} setProjectName={setProjectName}
+                                     projectNameError={projectNameError} groupId={groupId}
+                                     setGroupId={setGroupId} groupIdError={groupIdError}/>
+
+                    <Divider orientation="vertical" variant="middle" flexItem/>
+
+                    <Dependencies selectedVersion={selectedVersion}
+                                  selectedMavenPackages={selectedMavenPackages}
+                                  selectedMavenPackagesError={selectedMavenPackagesError}
+                                  handleSelect={handleSelect}/>
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: '6em'
+                    }}
+                >
+                    <Button
+                        variant='contained'
+                        loading={isGeneratingProject}
+                        onClick={handleGenerateProject}>
+                        Generate Project
+                    </Button>
+                </Box>
+            </Paper>
+        );
+    }
+
     return (
         <Box sx={{
             height: '100%',
@@ -134,78 +207,7 @@ function App() {
                 </Box>
             </Box>
 
-            {(() => {
-                if (isLoading) {
-                    return <CircularProgress/>;
-                } else if (getEdcVersionsError) {
-                    return (
-                        <Box
-                            sx={{
-                                flexGrow: 1,
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Alert severity="error" variant="outlined" sx={{maxWidth: 500}}>
-                                {getEdcVersionsError}
-                            </Alert>
-                        </Box>
-                    );
-                } else {
-                    return (
-                        <Paper
-                            elevation={6}
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                minWidth: 1200,
-                                minHeight: 600,
-                                maxHeight: 600,
-                                padding: '1em'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    flex: 1,
-                                    overflowY: 'hidden',
-                                }}
-                            >
-                                <ProjectSettings edcVersions={edcVersions} selectedVersion={selectedVersion}
-                                                 setSelectedVersion={setSelectedVersion}
-                                                 selectedVersionError={selectedVersionError}
-                                                 projectName={projectName} setProjectName={setProjectName}
-                                                 projectNameError={projectNameError} groupId={groupId}
-                                                 setGroupId={setGroupId} groupIdError={groupIdError}/>
-
-                                <Divider orientation="vertical" variant="middle" flexItem/>
-
-                                <Dependencies selectedVersion={selectedVersion}
-                                              selectedMavenPackages={selectedMavenPackages}
-                                              selectedMavenPackagesError={selectedMavenPackagesError}
-                                              handleSelect={handleSelect}/>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    marginTop: '6em'
-                                }}
-                            >
-                                <Button
-                                    variant='contained'
-                                    loading={isGeneratingProject}
-                                    onClick={handleGenerateProject}>
-                                    Generate Project
-                                </Button>
-                            </Box>
-                        </Paper>
-                    );
-                }
-            })()}
+            {content}
         </Box>
     )
 }
