@@ -12,8 +12,10 @@ import {
     Paper,
     Select, type SelectChangeEvent,
     TextField,
-    Typography
+    Typography, useColorScheme
 } from "@mui/material";
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 import * as React from "react";
 import useEdcVersions from "./hooks/useEdcVersions.ts";
 import AddDependenciesDialog from "./components/AddDependenciesDialog.tsx";
@@ -34,6 +36,7 @@ function App() {
     const [groupId, setGroupId] = React.useState<string>('');
     const [groupIdError, setGroupIdError] = React.useState<boolean>(false);
     const {isGeneratingProject, createProject} = useGenerateProject();
+    const { mode, setMode } = useColorScheme();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -120,11 +123,32 @@ function App() {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
-                <Typography
-                    component="h1"
-                    variant="h3">
-                    EDC Project Initializer
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    <Typography
+                        component="h1"
+                        variant="h3"
+                        sx={{
+                            position: 'absolute',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                        }}
+                    >
+                        EDC Project Initializer
+                    </Typography>
+                    <Box sx={{ marginLeft: 'auto', zIndex: 1, pr: 10 }}>
+                        {mode === 'dark' ? (
+                            <LightModeIcon
+                                sx={{ cursor: 'pointer', fontSize: 40 }}
+                                onClick={() => setMode('light')}
+                            />
+                        ) : (
+                            <DarkModeIcon
+                                sx={{ cursor: 'pointer', fontSize: 40 }}
+                                onClick={() => setMode('dark')}
+                            />
+                        )}
+                    </Box>
+                </Box>
 
                 {(() => {
                     if (isLoading) {
