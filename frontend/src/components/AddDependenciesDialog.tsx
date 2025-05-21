@@ -26,15 +26,20 @@ interface AddDependenciesDialogProps {
     handleSelect: (value: MavenPackageDTO) => () => void;
 }
 
-const AddDependenciesDialog = ({
-                                   open,
-                                   handleClose,
-                                   selectedVersion,
-                                   selectedMavenPackages,
-                                   handleSelect
-                               }: AddDependenciesDialogProps) => {
+const AddDependenciesDialog: React.FC<AddDependenciesDialogProps> = ({
+                                                                         open,
+                                                                         handleClose,
+                                                                         selectedVersion,
+                                                                         selectedMavenPackages,
+                                                                         handleSelect
+                                                                     }) => {
     const [pagination, setPagination] = useState({page: 1, pageSize: 25});
-    const {mavenPackagesResponse, error, isLoading, fetchMavenPackages} = useEdcMavenPackages(selectedVersion, pagination.page, pagination.pageSize);
+    const {
+        mavenPackagesResponse,
+        error,
+        isLoading,
+        fetchMavenPackages
+    } = useEdcMavenPackages(selectedVersion, pagination.page, pagination.pageSize);
 
     useEffect(() => {
         if (open) {
