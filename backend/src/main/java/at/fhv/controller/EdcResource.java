@@ -2,6 +2,7 @@ package at.fhv.controller;
 
 import at.fhv.dto.EdcReleaseDto;
 import at.fhv.dto.MavenPackagesResponseDto;
+import at.fhv.dto.ProblemDetailsDto;
 import at.fhv.dto.ProjectCreateDto;
 import at.fhv.service.interfaces.EdcService;
 import at.fhv.service.interfaces.ProjectGeneratorService;
@@ -10,10 +11,14 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.io.IOException;
@@ -31,6 +36,26 @@ public class EdcResource {
     }
 
     @GET
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200"),
+            @APIResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "504",
+                    description = "Gateway Timeout",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            )
+    })
+    @Operation(operationId = "getAllEdcReleases")
     @Path("/releases")
     public RestResponse<List<EdcReleaseDto>> getAllEdcReleases() {
         var releases = edcService.getAllEdcReleases();
@@ -39,6 +64,34 @@ public class EdcResource {
     }
 
     @GET
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200"),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "504",
+                    description = "Gateway Timeout",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            )
+    })
+    @Operation(operationId = "getEdcMavenPackagesForVersion")
     @Path("/packages")
     public RestResponse<MavenPackagesResponseDto> getEdcMavenPackagesForVersion(
             @QueryParam("version") String version,
@@ -51,7 +104,32 @@ public class EdcResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Returns the generated project as zip folder",
+                    content = @Content(
+                            mediaType = "application/zip"
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ProblemDetailsDto.class)
+                    )
+            )
+    })
+    @Operation(operationId = "generateEdcProject")
     @Path("/generate-project")
     public Response generateEdcProject(ProjectCreateDto projectCreateDto) throws IOException, URISyntaxException {
         var zipBytes = projectGeneratorService.generateProject(projectCreateDto);

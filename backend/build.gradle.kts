@@ -20,6 +20,7 @@ dependencies {
     implementation("io.quarkus:quarkus-rest-client-jackson")
     implementation("io.quarkus:quarkus-cache")
     implementation("io.quarkus:quarkus-qute")
+    implementation("io.quarkus:quarkus-smallrye-openapi")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
