@@ -37,6 +37,16 @@ For development purposes, a separate Docker Compose setup is provided.
     docker compose up --watch
     ```
 
+2. **The backend exposes Swagger UI, which is accessible at:**
+    ```
+    http://localhost:8080/q/swagger-ui
+    ```
+
+3. **AThe frontend is accessible at:**
+   ```
+   http://localhost:5173
+   ```
+
 ## Usage
 1. **Access the Application**:
    - Open your web browser and navigate to [`http://localhost:80`](http://localhost:80).
