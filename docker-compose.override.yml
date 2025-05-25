@@ -2,13 +2,12 @@ services:
   backend:
     image: edc-project-initializer-backend:dev
     build:
-      context: backend
-      dockerfile: src/main/docker/Dockerfile.dev
+      target: dev
     develop:
       watch:
         - action: sync
           path: backend
-          target: /app
+          target: /development
           ignore:
             - '**/build/'
             - '**/.gradle/'
@@ -20,15 +19,14 @@ services:
   frontend:
     image: edc-project-initializer-frontend:dev
     build:
-      context: frontend
-      dockerfile: Dockerfile.dev
+      target: dev
     ports:
       - 5173:5173
     develop:
       watch:
         - action: sync
           path: ./frontend
-          target: /app
+          target: /development
           ignore:
             - node_modules/
             - dist/
