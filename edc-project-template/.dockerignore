@@ -4,4 +4,4 @@
 !build.gradle.kts
 !gradle.properties
 !gradle
-!{projectName}
+!src

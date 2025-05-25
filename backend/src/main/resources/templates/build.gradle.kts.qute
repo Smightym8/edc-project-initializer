@@ -12,7 +12,6 @@
  *
  */
 
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 
 /*
@@ -38,21 +37,37 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 
 plugins {
     id("application")
+    alias(libs.plugins.edc.build)
     alias(libs.plugins.shadow)
-    alias(libs.plugins.docker)
 }
+
+val annotationProcessorVersion: String by project
+val metaModelVersion: String by project
 
 dependencies {
     // Add dependencies
-    {#for dependency in dependencies}
-        implementation("{dependency.id}")
-    {/for}
+{#for dependency in dependencies}
+    implementation("{dependency.id}")
+{/for}
 }
+
+apply(plugin = "org.eclipse.edc.edc-build")
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     exclude("**/pom.properties", "**/pom.xm")
     mergeServiceFiles()
     archiveFileName.set("$\{project.name}.jar")
+}
+
+configure<org.eclipse.edc.plugins.autodoc.AutodocExtension> {
+    processorVersion.set(annotationProcessorVersion)
+    outputDirectory.set(layout.buildDirectory.asFile)
+}
+
+configure<org.eclipse.edc.plugins.edcbuild.extensions.BuildExtension> {
+    versions {
+        metaModel.set(metaModelVersion)
+    }
 }
 
 application {
@@ -61,17 +76,4 @@ application {
 
 edcBuild {
     publish.set(false)
-}
-
-// configure the "dockerize" task
-tasks.register("dockerize", DockerBuildImage::class) {
-    val dockerContextDir = project.projectDir.parentFile
-    dockerFile.set(file("$\{project.projectDir}/src/main/docker/Dockerfile"))
-    images.add("$\{project.name}:$\{project.version}")
-    images.add("$\{project.name}:latest")
-    // specify platform with the -Dplatform flag:
-    if (System.getProperty("platform") != null)
-        platform.set(System.getProperty("platform"))
-    inputDir.set(file(dockerContextDir))
-    dependsOn(tasks.named(ShadowJavaPlugin.SHADOW_JAR_TASK_NAME))
 }

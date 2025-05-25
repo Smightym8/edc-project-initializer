@@ -12,7 +12,7 @@
  *
  */
 
-rootProject.name = "template"
+rootProject.name = "{projectName}"
 
 // this is needed to have access to snapshot builds of plugins
 pluginManagement {
@@ -35,6 +35,3 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-// add dependencies
-include(":{projectName}")

@@ -17,5 +17,4 @@ version=0.1.0-SNAPSHOT
 
 # configure the build
 annotationProcessorVersion=0.8.1
-edcGradlePluginsVersion=0.8.1
 metaModelVersion=0.8.1
