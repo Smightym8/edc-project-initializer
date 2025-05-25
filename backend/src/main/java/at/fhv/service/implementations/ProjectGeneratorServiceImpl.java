@@ -32,9 +32,6 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
     @Location("build.gradle.kts.qute")
     Template buildGradleTemplate;
 
-    @Location("dockerignore.qute")
-    Template dockerignoreTemplate;
-
     @Location("Dockerfile.qute")
     Template dockerfileTemplate;
 
@@ -42,7 +39,6 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
     private static final String SETTING_GRADLE_FILE_NAME = "settings.gradle.kts";
     private static final String GRADLE_PROPERTIES_FILE_NAME = "gradle.properties";
     private static final String BUILD_GRADLE_FILE_NAME = "build.gradle.kts";
-    private static final String DOCKER_IGNORE_FILE_NAME = ".dockerignore";
     private static final String DOCKERFILE_FILE_NAME = "Dockerfile";
 
     @Override
@@ -60,9 +56,8 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
 
             addTemplateToZip(settingsGradleTemplate, SETTING_GRADLE_FILE_NAME, projectCreateDto, zipOut);
             addTemplateToZip(gradlePropertiesTemplate, GRADLE_PROPERTIES_FILE_NAME, projectCreateDto, zipOut);
-            addTemplateToZip(buildGradleTemplate, Paths.get(projectCreateDto.projectName(), BUILD_GRADLE_FILE_NAME).toString(), projectCreateDto, zipOut);
-            addTemplateToZip(dockerignoreTemplate, DOCKER_IGNORE_FILE_NAME, projectCreateDto, zipOut);
-            addTemplateToZip(dockerfileTemplate, Paths.get(projectCreateDto.projectName(), "src", "main", "docker", DOCKERFILE_FILE_NAME).toString(), projectCreateDto, zipOut);
+            addTemplateToZip(buildGradleTemplate, BUILD_GRADLE_FILE_NAME, projectCreateDto, zipOut);
+            addTemplateToZip(dockerfileTemplate, Paths.get("src", "main", "docker", DOCKERFILE_FILE_NAME).toString(), projectCreateDto, zipOut);
         }
 
         return byteArrayOutputStream.toByteArray();
