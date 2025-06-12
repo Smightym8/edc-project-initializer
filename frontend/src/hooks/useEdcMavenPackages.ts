@@ -8,6 +8,10 @@ const useEdcMavenPackages = (selectedVersion: string, page: number, pageSize: nu
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const fetchMavenPackages = useCallback(() => {
+        setIsLoading(true);
+        setError(null);
+        setMavenPackagesResponse(null);
+
         getEDCMavenPackages(selectedVersion, page, pageSize)
             .then((response) => {
                 setMavenPackagesResponse(response);
