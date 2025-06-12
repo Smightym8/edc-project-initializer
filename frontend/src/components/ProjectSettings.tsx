@@ -14,7 +14,7 @@ import * as React from "react";
 interface ProjectSettingsProps {
     edcVersions: { name: string }[];
     selectedVersion: string;
-    setSelectedVersion: (value: string) => void;
+    handleSelectVersion: (value: string) => void;
     selectedVersionError: boolean;
     projectName: string;
     setProjectName: (value: string) => void;
@@ -28,7 +28,7 @@ const ProjectSettings: React.FC<ProjectSettingsProps> = ({
                                                              edcVersions,
                                                              selectedVersion,
                                                              selectedVersionError,
-                                                             setSelectedVersion,
+                                                             handleSelectVersion,
                                                              projectName,
                                                              setProjectName,
                                                              projectNameError,
@@ -54,7 +54,7 @@ const ProjectSettings: React.FC<ProjectSettingsProps> = ({
                     label="EDC Version"
                     value={selectedVersion}
                     onChange={(e: SelectChangeEvent) => {
-                        setSelectedVersion(e.target.value);
+                        handleSelectVersion(e.target.value);
                     }}
                 >
                     {edcVersions.map((edcVersion) => (

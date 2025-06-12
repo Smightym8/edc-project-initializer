@@ -17,10 +17,12 @@ import type {ProjectCreateDTO} from "./api/models/project-create-dto.ts";
 import useGenerateProject from "./hooks/useGenerateProject.ts";
 import ProjectSettings from "./components/ProjectSettings.tsx";
 import Dependencies from "./components/Dependencies.tsx";
+import EdcVersionConfirmationDialog from "./components/EdcVersionConfirmationDialog.tsx";
 
 function App() {
     const {edcVersions, getEdcVersionsError, isLoading} = useEdcVersions();
     const [selectedVersion, setSelectedVersion] = React.useState<string>('');
+    const [selectedVersionUnconfirmed, setSelectedVersionUnconfirmed] = React.useState<string>('');
     const [selectedVersionError, setSelectedVersionError] = React.useState<boolean>(false);
     const [selectedMavenPackages, setSelectedMavenPackages] = React.useState<MavenPackageDTO[]>([]);
     const [selectedMavenPackagesError, setSelectedMavenPackagesError] = React.useState<boolean>(false);
@@ -28,6 +30,7 @@ function App() {
     const [projectNameError, setProjectNameError] = React.useState<boolean>(false);
     const [groupId, setGroupId] = React.useState<string>('');
     const [groupIdError, setGroupIdError] = React.useState<boolean>(false);
+    const [open, setOpen] = React.useState(false);
     const {isGeneratingProject, createProject} = useGenerateProject();
     const {mode, setMode} = useColorScheme();
 
@@ -44,6 +47,24 @@ function App() {
         setSelectedMavenPackages(newChecked);
     };
 
+    const handleSelectVersion = (version: string) => {
+        if (selectedMavenPackages.length > 0) {
+            setSelectedVersionUnconfirmed(version);
+            setOpen(true);
+        } else {
+            setSelectedVersion(version);
+        }
+    }
+
+    const handleClose = (isConfirmed: boolean) => {
+        if (isConfirmed) {
+            setSelectedVersion(selectedVersionUnconfirmed);
+            setSelectedMavenPackages([]);
+        }
+
+        setOpen(false);
+    }
+
     const handleGenerateProject = () => {
         if (!isFormValid()) {
             return;
@@ -56,6 +77,10 @@ function App() {
         }
 
         createProject(projectCreateDto);
+        setSelectedVersion('');
+        setProjectName('');
+        setGroupId('');
+        setSelectedMavenPackages([]);
     }
 
     const isFormValid = (): boolean => {
@@ -117,55 +142,58 @@ function App() {
         );
     } else {
         content = (
-            <Paper
-                elevation={6}
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    minWidth: 1200,
-                    minHeight: 600,
-                    maxHeight: 600,
-                    padding: '1em'
-                }}
-            >
-                <Box
+            <>
+                <Paper
+                    elevation={6}
                     sx={{
                         display: 'flex',
-                        flexDirection: 'row',
-                        flex: 1,
-                        overflowY: 'hidden',
+                        flexDirection: 'column',
+                        minWidth: 1200,
+                        minHeight: 600,
+                        maxHeight: 600,
+                        padding: '1em'
                     }}
                 >
-                    <ProjectSettings edcVersions={edcVersions} selectedVersion={selectedVersion}
-                                     setSelectedVersion={setSelectedVersion}
-                                     selectedVersionError={selectedVersionError}
-                                     projectName={projectName} setProjectName={setProjectName}
-                                     projectNameError={projectNameError} groupId={groupId}
-                                     setGroupId={setGroupId} groupIdError={groupIdError}/>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flex: 1,
+                            overflowY: 'hidden',
+                        }}
+                    >
+                        <ProjectSettings edcVersions={edcVersions} selectedVersion={selectedVersion}
+                                         handleSelectVersion={handleSelectVersion}
+                                         selectedVersionError={selectedVersionError}
+                                         projectName={projectName} setProjectName={setProjectName}
+                                         projectNameError={projectNameError} groupId={groupId}
+                                         setGroupId={setGroupId} groupIdError={groupIdError}/>
 
-                    <Divider orientation="vertical" variant="middle" flexItem/>
+                        <Divider orientation="vertical" variant="middle" flexItem/>
 
-                    <Dependencies selectedVersion={selectedVersion}
-                                  selectedMavenPackages={selectedMavenPackages}
-                                  selectedMavenPackagesError={selectedMavenPackagesError}
-                                  handleSelect={handleSelect}/>
-                </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: '6em'
-                    }}
-                >
-                    <Button
-                        variant='contained'
-                        loading={isGeneratingProject}
-                        onClick={handleGenerateProject}>
-                        Generate Project
-                    </Button>
-                </Box>
-            </Paper>
+                        <Dependencies selectedVersion={selectedVersion}
+                                      selectedMavenPackages={selectedMavenPackages}
+                                      selectedMavenPackagesError={selectedMavenPackagesError}
+                                      handleSelect={handleSelect}/>
+                    </Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginTop: '6em'
+                        }}
+                    >
+                        <Button
+                            variant='contained'
+                            loading={isGeneratingProject}
+                            onClick={handleGenerateProject}>
+                            Generate Project
+                        </Button>
+                    </Box>
+                </Paper>
+                <EdcVersionConfirmationDialog open={open} handleClose={handleClose}/>
+            </>
         );
     }
 
