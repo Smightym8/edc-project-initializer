@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -76,6 +75,15 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
 
         if (projectCreateDto.dependencies() == null || projectCreateDto.dependencies().isEmpty()) {
             invalidParameters.add(new InvalidParamDto("dependencies", "Dependencies are required"));
+        } else {
+            var edcVersion = projectCreateDto.dependencies().getFirst().version();
+
+            for (var dependency : projectCreateDto.dependencies()) {
+                if (!dependency.version().equals(edcVersion)) {
+                    invalidParameters.add(new InvalidParamDto("dependencies", "All dependencies must have the same version"));
+                    break;
+                }
+            }
         }
 
         if (!invalidParameters.isEmpty()) {
@@ -83,51 +91,43 @@ public class ProjectGeneratorServiceImpl implements ProjectGeneratorService {
         }
     }
 
-    private void zipDirectoryFromFileSystem(File fileToZip, String fileName, ZipOutputStream zipOut) {
+    private void zipDirectoryFromFileSystem(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
         if (fileToZip.isHidden()) {
             return;
         }
 
-        try {
-            if (fileToZip.isDirectory()) {
-                if (!fileName.endsWith("/")) {
-                    fileName += "/";
-                }
-
-                zipOut.putNextEntry(new ZipEntry(fileName));
-                zipOut.closeEntry();
-
-                for (File child : Objects.requireNonNull(fileToZip.listFiles())) {
-                    zipDirectoryFromFileSystem(child, fileName + child.getName(), zipOut);
-                }
-            } else {
-                zipOut.putNextEntry(new ZipEntry(fileName));
-
-                try (InputStream fis = Files.newInputStream(fileToZip.toPath())) {
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = fis.read(buffer)) >= 0) {
-                        zipOut.write(buffer, 0, length);
-                    }
-                }
-
-                zipOut.closeEntry();
+        if (fileToZip.isDirectory()) {
+            if (!fileName.endsWith("/")) {
+                fileName += "/";
             }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+
+            zipOut.putNextEntry(new ZipEntry(fileName));
+            zipOut.closeEntry();
+
+            for (File child : Objects.requireNonNull(fileToZip.listFiles())) {
+                zipDirectoryFromFileSystem(child, fileName + child.getName(), zipOut);
+            }
+        } else {
+            zipOut.putNextEntry(new ZipEntry(fileName));
+
+            try (InputStream fis = Files.newInputStream(fileToZip.toPath())) {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = fis.read(buffer)) >= 0) {
+                    zipOut.write(buffer, 0, length);
+                }
+            }
+
+            zipOut.closeEntry();
         }
     }
 
-    private void addTemplateToZip(Template template, String path, ProjectCreateDto projectCreateDto, ZipOutputStream zipOut) {
-        try {
-            String renderedContent = template.data(projectCreateDto).render();
+    private void addTemplateToZip(Template template, String path, ProjectCreateDto projectCreateDto, ZipOutputStream zipOut) throws IOException {
+        String renderedContent = template.data(projectCreateDto).render();
 
-            ZipEntry entry = new ZipEntry(path);
-            zipOut.putNextEntry(entry);
-            zipOut.write(renderedContent.getBytes());
-            zipOut.closeEntry();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        ZipEntry entry = new ZipEntry(path);
+        zipOut.putNextEntry(entry);
+        zipOut.write(renderedContent.getBytes());
+        zipOut.closeEntry();
     }
 }

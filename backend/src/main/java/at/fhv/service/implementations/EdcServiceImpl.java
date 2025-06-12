@@ -17,6 +17,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @ApplicationScoped
@@ -46,6 +47,8 @@ public class EdcServiceImpl implements EdcService {
 
         String response = mavenCentralApiClient.getMavenPackagesForVersion(query, start, pageSize, JSON_FORMAT);
         var mavenPackages = parseMavenPackages(response);
+        mavenPackages.sort(Comparator.comparing(MavenPackageDto::name));
+
         var totalPages = calculateTotalPages(response);
         var paginationInfo = new PaginationInfoDto(totalPages, page);
 
@@ -84,7 +87,8 @@ public class EdcServiceImpl implements EdcService {
         for (JsonNode doc : docs) {
             String id = doc.path("id").asText();
             String artifactId = doc.path("a").asText();
-            packages.add(new MavenPackageDto(id, artifactId));
+            String version = doc.path("v").asText();
+            packages.add(new MavenPackageDto(id, artifactId, version));
         }
 
         return packages;
